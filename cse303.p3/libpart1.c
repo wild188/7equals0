@@ -9,3 +9,11 @@ void *hello(void *input) {
     printf("hello from a .so\n");
     return NULL;
 }
+
+//Billys shit
+void * ucase(void * input){
+    struct team_t * newTeam = malloc(sizeOf(team_t);
+    //how do we access unnames string literal fields in team_t struct?
+    free(newTeam);
+    return NULL;
+}
