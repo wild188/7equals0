@@ -21,9 +21,8 @@ SOFILES   = $(patsubst %, $(ODIR)/%.so, $(CSOFILES))
 EXEOFILES = $(patsubst %, $(ODIR)/%.o,  $(TARGETS))
 DEPS      = $(patsubst %, $(ODIR)/%.d,  $(CFILES) $(CSOFILES) $(TARGETS))
 
-# Use gcc and g++
 CC = gcc
-CFLAGS = -MMD -O2 -m$(BITS) -ggdb -D_GNU_SOURCE -std=gnu11
+CFLAGS = -MMD -O2 -m$(BITS) -ggdb -g -D_GNU_SOURCE -std=gnu11
 SOFLAGS = -fPIC -shared
 LDFLAGS = -m$(BITS) -ldl
 

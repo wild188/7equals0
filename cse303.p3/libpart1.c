@@ -16,18 +16,17 @@ void *hello(void *input) {
 }
 
 //Billys shit dont know how to test this
-void * ucase(void * input){
-    
-    printf("Billy says hello!\n");
+void *ucase(void * input){
     
     //This could cause an error if input isnt a team structure
     struct team_t * oldTeam = (struct team_t *)input;
-
     struct team_t * newTeam = malloc(sizeof(struct team_t));
+    int t = strlen((const char *)oldTeam->name1);
     
-    //copying name1
-    char * temp = malloc(sizeof(oldTeam->name1));
-    *temp = *oldTeam->name1;
+    char * temp = (char *)malloc(t*sizeof(char));
+
+    char * balls = oldTeam->name1;
+    strcpy(temp, balls);
     newTeam->name1 = malloc(*temp);
     int i = 0;
     for(i = 0; i < strlen(temp); i++){
@@ -36,8 +35,8 @@ void * ucase(void * input){
     free(temp);
 
     //copying email1
-    temp = malloc(sizeof(oldTeam->email1));
-    *temp = *oldTeam->email1;
+    temp = malloc(strlen(oldTeam->email1) * sizeof(oldTeam->email1));
+    strcpy(temp, oldTeam->email1);
     newTeam->email1 = malloc(*temp);
     i = 0;
     for(i = 0; i < strlen(temp); i++){
@@ -46,8 +45,8 @@ void * ucase(void * input){
     free(temp);
 
     //copying name2
-    temp = malloc(sizeof(oldTeam->name2));
-    *temp = *oldTeam->name2;
+    temp = malloc(strlen(oldTeam->name2) * sizeof(oldTeam->name2));
+    strcpy(temp, oldTeam->name2);
     newTeam->name2 = malloc(*temp);
     i = 0;
     for(i = 0; i < strlen(temp); i++){
@@ -56,14 +55,21 @@ void * ucase(void * input){
     free(temp);
 
     //copying email2
-    temp = malloc(sizeof(oldTeam->email2));
-    *temp = *oldTeam->email2;
+    temp = malloc(strlen(oldTeam->email2) * sizeof(oldTeam->email2));
+    strcpy(temp, oldTeam->email2);
     newTeam->email2 = malloc(*temp);
     i = 0;
     for(i = 0; i < strlen(temp); i++){
         newTeam->email2[i] = toupper(temp[i]);
     }
     free(temp);
+
+    //printing results
+    printf("Student 1 : %s\n", newTeam->name1);
+    printf("Email 1   : %s\n", newTeam->email1);
+    printf("Student 2 : %s\n", newTeam->name2);
+    printf("Email 2   : %s\n", newTeam->email2);
+    printf("\n");
 
     free(newTeam);
     return NULL;

@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
     hello(NULL);
 
     /* TODO: execute the new function "ucase" that you added to libpart1.c */
+    ucase((void *)&team);
 
     exit(0);
 }
