@@ -17,6 +17,8 @@ void help(char *progname) {
  */
 extern void *hello(void* param);
 
+extern void *ucase(void* input);
+
 /*
  * main() - The main routine parses arguments and invokes hello
  */

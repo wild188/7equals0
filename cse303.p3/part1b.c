@@ -2,12 +2,22 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "support.h"
+//Billy
+#include <dlfcn.h>
 
 /*
  * load_and_invoke() - load the given .so and execute the specified function
  */
 void load_and_invoke(char *libname, char *funcname) {
     /* TODO: complete this function */
+    int mode = 0; //I dont know what the mode should be
+    void * lib = dlopen(libname, mode);
+    void * result = dlsym(lib, funcname);
+    if(result == NULL){
+        printf("We might have failed to run %s in %s\n", funcname, libname);
+    }
+
+    dlclose(lib);
 }
 
 /*
@@ -39,7 +49,7 @@ int main(int argc, char **argv) {
     }
 
     /* call load_and_invoke() to run the given function of the given library */
-    load_and_invoke(NULL, NULL);
+    load_and_invoke(NULL, "hello"); //we have to get eh library path
 
     exit(0);
 }
