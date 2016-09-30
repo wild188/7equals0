@@ -10,8 +10,12 @@
  */
 void load_and_invoke(char *libname, char *funcname) {
     /* TODO: complete this function */
-    int mode = 0; //I dont know what the mode should be
+    int mode = RTLD_LOCAL; //I dont know what the mode should be
     void * lib = dlopen(libname, mode);
+    if(lib == NULL){
+        printf("Failed to load library with path %s\n", libname);
+        exit(1);
+    }
     void * result = dlsym(lib, funcname);
     if(result == NULL){
         printf("We might have failed to run %s in %s\n", funcname, libname);
@@ -49,7 +53,9 @@ int main(int argc, char **argv) {
     }
 
     /* call load_and_invoke() to run the given function of the given library */
-    load_and_invoke(NULL, "hello"); //we have to get eh library path
+    //~/Programs/cse303/project3/7equals0/cse303.p3/obj64/libpart1.so
+    
+    load_and_invoke("/home/billy/Programs/cse303/project3/7equals0/cse303.p3/obj64/libpart1.so", "hello"); //we have to get eh library path
 
     exit(0);
 }
