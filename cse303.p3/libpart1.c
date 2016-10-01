@@ -21,12 +21,11 @@ void *ucase(void * input){
     //This could cause an error if input isnt a team structure
     struct team_t * oldTeam = (struct team_t *)input;
     struct team_t * newTeam = malloc(sizeof(struct team_t));
-    int t = strlen((const char *)oldTeam->name1);
-    
-    char * temp = (char *)malloc(t*sizeof(char));
 
-    char * balls = oldTeam->name1;
-    strcpy(temp, balls);
+    //Copying name1
+    int t = strlen((const char *)oldTeam->name1);
+    char * temp = (char *)malloc(t*sizeof(char));
+    strcpy(temp, oldTeam->name1);
     newTeam->name1 = malloc(*temp);
     int i = 0;
     for(i = 0; i < strlen(temp); i++){
