@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     //~/Programs/cse303/project3/7equals0/cse303.p3/obj64/libpart1.so
     ///home/billy/Programs/cse303/project3/7equals0/cse303.p3/obj64/libpart1.so
     
-    load_and_invoke("./libpart1.so", "hello"); //we have to get eh library path
+    load_and_invoke("./libpart1.so", "hello"); //we have to get the library path
 
     exit(0);
 }

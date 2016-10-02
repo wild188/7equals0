@@ -1,3 +1,7 @@
+//Balls
+
+
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -27,6 +31,7 @@ void OpenMemoryManagement()__attribute__((constructor));
 void CloseMemoryManagement()__attribute__((destructor));
 
 void OpenMemoryManagement() { // This is the constructor
+    printf("created memory management lib\n");
     unfreeBlocks = 0;
 }
 
