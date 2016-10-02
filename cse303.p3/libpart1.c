@@ -15,7 +15,6 @@ void *hello(void *input) {
     return NULL;
 }
 
-//Billys shit dont know how to test this
 void *ucase(void * input){
     
     //This could cause an error if input isnt a team structure

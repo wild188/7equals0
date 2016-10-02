@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <dlfcn.h>
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -33,12 +34,26 @@ void CloseMemoryManagement(){ // This is the deconstructor
     printf("%i unfreed blocks of memory.\n", unfreeBlocks);
 }
 
-void * malloc(size_t size){
-    unfreeBlocks++;
-    //call real malloc
+//a wrapper function for the real malloc
+static void * ogMalloc(size_t size){
+    void * (*realMalloc)(size_t) = dlsym(RTLD_NEXT, "malloc");
+    return realMalloc(size);
 }
 
+//wrapper function for the real OG free
+static void ogFree(void * space){
+    void (*realFree)(void *) = dlsym(RTLD_NEXT, "free");
+    realFree(space);
+}
+
+//should intercept calls to malloc
+void * malloc(size_t size){
+    unfreeBlocks++;
+    return ogMalloc(size);
+}
+
+//should intercept calls to free
 void free(void * space){
     unfreeBlocks--;
-    //call real free
+    return ogFree(space);
 }
