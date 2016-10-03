@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 /*
  * Note: 'uintptr_t' is a special type of unsigned integer that is guaranteed
@@ -28,6 +29,18 @@ typedef struct map_node
  */
 static map_node_t* alloc_info;
 
+//return the index of the map node -1 if not found
+int find_node(uintptr_t target){
+  int length = sizeof(alloc_info)/ sizeof(map_node_t);
+  int index;
+  for(index = 0; index < length; index++){
+    if(alloc_info[index].allocated_pointer == target){
+      return index;
+    }
+  }
+  return -1;
+}
+
 /*
  * insert() - when malloc() is called, your interpositioning library
  *            should use this to store the pointer that malloc returned,
@@ -36,8 +49,25 @@ static map_node_t* alloc_info;
  *            successfully added, and 0 if the pointer was already in the
  *            map.
  */
+ 
 int map_insert(uintptr_t pointer, char *module, char *line) {
-  /* TODO: complete this code */
+
+  if(find_node(pointer) > 0){
+    return 0; //we already had the allocation in our allocation information
+  }
+  
+  int length = sizeof(alloc_info)/ sizeof(map_node_t);
+
+  size_t size = ((length + 1) * sizeof(map_node_t));
+
+  alloc_info = (map_node_t*)realloc(alloc_info, size);
+  alloc_info[length].allocated_pointer = pointer;
+  
+  //what is a molule, line, call site, or program counter
+  //the following lines are most definately wrong
+  alloc_info[length].call_site = module;
+  alloc_info[length].program_counter = line;
+  return 1;
 }
 
 /*
@@ -49,10 +79,23 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  *            successful, and 0 if the pointer was already removed from the
  *            map (which would suggest a double-free).
  */
+ /*
 int map_remove(uintptr_t pointer) {
-  /* TODO: complete this code */
-}
+  
+  int index = find_node(pointer);
+  if(index < 0){
+    int length = sizeof(alloc_info)/ sizeof(map_node_t);
+    int i;
+    for(i = index; i < (length -1); i++){
 
+    }
+    alloc_info = realloc(alloc_info, ((length -1) * sizeof(map_node_t)));
+  }else{ //the pointer wasn't in our allocation info
+    return 0;
+  }
+
+}
+*/
 /*
  * count() - return the number of elements in the map.  This can indicate
  *           that there are un-freed allocations (memory leaks).
