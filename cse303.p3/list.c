@@ -57,11 +57,22 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
     return 0; //we already had the allocation in our allocation information
   }
   
+  map_node_t * curr = alloc_info;
+  if(curr != NULL){
+    while(curr->next != NULL){
+      curr = curr->next;
+    }
+  }
   
+  map_node_t * newnode = malloc(sizeof(map_node_t));
+  //assigning
+  curr->next = newnode;
+
+  newnode->allocated_pointer = pointer;
   //what is a molule, line, call site, or program counter
   //the following lines are most definately wrong
-  alloc_info[length].call_site = module;
-  alloc_info[length].program_counter = line;
+  newnode->call_site = module;
+  newnode->program_counter = line;
   return 1;
 }
 
@@ -77,18 +88,28 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  
 int map_remove(uintptr_t pointer) {
   
-  int index = find_node(pointer);
-  if(index < 0){
-    int length = sizeof(alloc_info)/ sizeof(map_node_t);
-    int i;
-    for(i = index; i < (length -1); i++){
-
+  map_node_t* curr = alloc_info;
+  if(curr != NULL){
+    while(curr->next != NULL){
+      if(curr->next->allocated_pointer == pointer){
+        map_node_t * target = curr->next;
+        curr->next = curr->next->next;
+        free(target);
+        return 1;
+      }
     }
-    alloc_info = realloc(alloc_info, ((length -1) * sizeof(map_node_t)));
+  }
+
+  return 0;
+/*
+  map_node_t * space = find_node(pointer);
+  if(space){
+    
   }else{ //the pointer wasn't in our allocation info
     return 0;
   }
   return 0;
+*/
 }
 
 /*
