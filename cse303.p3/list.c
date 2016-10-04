@@ -20,6 +20,7 @@ typedef struct map_node
   uintptr_t allocated_pointer;
   char      *call_site;
   char      *program_counter;
+  struct map_node * next;
 } map_node_t;
 
 /*
@@ -30,15 +31,15 @@ typedef struct map_node
 static map_node_t* alloc_info;
 
 //return the index of the map node -1 if not found
-int find_node(uintptr_t target){
-  int length = sizeof(alloc_info)/ sizeof(map_node_t);
-  int index;
-  for(index = 0; index < length; index++){
-    if(alloc_info[index].allocated_pointer == target){
-      return index;
+map_node_t* find_node(uintptr_t target){
+  map_node_t* curr = alloc_info;
+  while(curr != NULL){
+    if(curr->allocated_pointer == target){
+      return curr;
     }
+    curr = curr->next;
   }
-  return -1;
+  return NULL;
 }
 
 /*
@@ -52,24 +53,10 @@ int find_node(uintptr_t target){
  
 int map_insert(uintptr_t pointer, char *module, char *line) {
 
-  if(find_node(pointer) != -1){
-    //return 0; //we already had the allocation in our allocation information
-    int length = sizeof(alloc_info)/ sizeof(map_node_t);
-    int index;
-    for(index = 0; index < length; index++){
-      if(alloc_info[index].allocated_pointer == pointer){
-        printf("Found target\n");
-        return 0;//index;
-      }
-    }
+  if(find_node(pointer)){
+    return 0; //we already had the allocation in our allocation information
   }
   
-  int length = sizeof(alloc_info)/ sizeof(map_node_t);
-  //printf("Length %i\n", length);
-  size_t size = ((length + 1) * sizeof(map_node_t));
-
-  alloc_info = (map_node_t*)realloc(alloc_info, size);
-  alloc_info[length].allocated_pointer = pointer;
   
   //what is a molule, line, call site, or program counter
   //the following lines are most definately wrong
@@ -122,7 +109,7 @@ void map_dump() {
   printf("Map dump %p\n", curr);
   int i = 0;
   while (curr) {
-    curr = (alloc_info[i]);
+    curr = &(alloc_info[i]);
     i++;
     printf("  0x%x allocated by %s::%s", (uint)curr->allocated_pointer, curr->call_site, curr->program_counter);
   }
