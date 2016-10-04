@@ -96,8 +96,13 @@ int map_remove(uintptr_t pointer) {
  *           that there are un-freed allocations (memory leaks).
  */
 int map_count() {
-  /* TODO: complete this code */
-  return -1;
+  map_node_t * temp = alloc_info;
+  int count = 0;
+  while(temp->next != NULL){
+    temp = temp->next;
+    count++;
+  }
+  return count;
 }
 
 /*
@@ -105,12 +110,11 @@ int map_count() {
  */
 void map_dump() {
   
-  map_node_t* curr = alloc_info;
-  printf("Map dump %p\n", curr);
+  map_node_t* temp = alloc_info;
+  printf("Map dump %p\n", temp);
   int i = 0;
-  while (curr) {
-    curr = &(alloc_info[i]);
-    i++;
-    printf("  0x%x allocated by %s::%s", (uint)curr->allocated_pointer, curr->call_site, curr->program_counter);
+  while (temp->next != NULL) {
+    temp = temp->next;
+    printf("  0x%x allocated by %s::%s", (uint)temp->allocated_pointer, temp->call_site, temp->program_counter);
   }
 }
