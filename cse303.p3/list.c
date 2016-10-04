@@ -52,12 +52,20 @@ int find_node(uintptr_t target){
  
 int map_insert(uintptr_t pointer, char *module, char *line) {
 
-  if(find_node(pointer) > 0){
-    return 0; //we already had the allocation in our allocation information
+  if(find_node(pointer) != -1){
+    //return 0; //we already had the allocation in our allocation information
+    int length = sizeof(alloc_info)/ sizeof(map_node_t);
+    int index;
+    for(index = 0; index < length; index++){
+      if(alloc_info[index].allocated_pointer == pointer){
+        printf("Found target\n");
+        return 0;//index;
+      }
+    }
   }
   
   int length = sizeof(alloc_info)/ sizeof(map_node_t);
-
+  //printf("Length %i\n", length);
   size_t size = ((length + 1) * sizeof(map_node_t));
 
   alloc_info = (map_node_t*)realloc(alloc_info, size);
@@ -79,7 +87,7 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  *            successful, and 0 if the pointer was already removed from the
  *            map (which would suggest a double-free).
  */
- /*
+ 
 int map_remove(uintptr_t pointer) {
   
   int index = find_node(pointer);
@@ -93,9 +101,9 @@ int map_remove(uintptr_t pointer) {
   }else{ //the pointer wasn't in our allocation info
     return 0;
   }
-
+  return 0;
 }
-*/
+
 /*
  * count() - return the number of elements in the map.  This can indicate
  *           that there are un-freed allocations (memory leaks).
@@ -109,9 +117,13 @@ int map_count() {
  * dump() - output the contents of the list
  */
 void map_dump() {
-  /* TODO: complete this code */
+  
   map_node_t* curr = alloc_info;
+  printf("Map dump %p\n", curr);
+  int i = 0;
   while (curr) {
-    printf("  0x%x allocated by %s::%s", -1, "-1", "-1");
+    curr = (alloc_info[i]);
+    i++;
+    printf("  0x%x allocated by %s::%s", (uint)curr->allocated_pointer, curr->call_site, curr->program_counter);
   }
 }

@@ -31,12 +31,15 @@ void OpenMemoryManagement()__attribute__((constructor));
 void CloseMemoryManagement()__attribute__((destructor));
 
 void OpenMemoryManagement() { // This is the constructor
-    printf("created memory management lib\n");
+    //printf("created memory management lib\n");
     unfreeBlocks = 0;
 }
 
 void CloseMemoryManagement(){ // This is the deconstructor
     printf("%i unfreed blocks of memory.\n", unfreeBlocks);
+    if(unfreeBlocks != 0){
+        map_dump();
+    }
 }
 
 //a wrapper function for the real malloc
@@ -49,16 +52,21 @@ static void * ogMalloc(size_t size){
 static void ogFree(void * space){
     void (*realFree)(void *) = dlsym(RTLD_NEXT, "free");
     realFree(space);
+    
 }
 
 //should intercept calls to malloc
 void * malloc(size_t size){
     unfreeBlocks++;
-    return ogMalloc(size);
+    void * pointer = ogMalloc(size);
+    //need to get module and line pointers
+    map_insert((uintptr_t)pointer, NULL, NULL);
+    return pointer;
 }
 
 //should intercept calls to free
 void free(void * space){
     unfreeBlocks--;
+    map_remove((uintptr_t)space);
     return ogFree(space);
 }

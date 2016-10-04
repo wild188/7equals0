@@ -22,7 +22,7 @@ EXEOFILES = $(patsubst %, $(ODIR)/%.o,  $(TARGETS))
 DEPS      = $(patsubst %, $(ODIR)/%.d,  $(CFILES) $(CSOFILES) $(TARGETS))
 
 CC = gcc
-CFLAGS = -MMD -O2 -m$(BITS) -ggdb -g -D_GNU_SOURCE -std=gnu11
+CFLAGS = -MMD -O2 -m$(BITS) -ggdb -g -D_GNU_SOURCE -std=gnu11 -fPIC
 SOFLAGS = -fPIC -shared
 LDFLAGS = -m$(BITS) -ldl
 
