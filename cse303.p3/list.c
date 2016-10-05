@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+//#include "libpart2.c"
+
 /*
  * Note: 'uintptr_t' is a special type of unsigned integer that is guaranteed
  *       to be the same size as pointers.  This is the preferred way to cast
@@ -35,6 +37,7 @@ map_node_t* find_node(uintptr_t target){
   map_node_t* curr = alloc_info;
   while(curr != NULL){
     if(curr->allocated_pointer == target){
+      printf("Im the worlds greatest detecive\n");
       return curr;
     }
     curr = curr->next;
@@ -53,26 +56,45 @@ map_node_t* find_node(uintptr_t target){
  
 int map_insert(uintptr_t pointer, char *module, char *line) {
 
+  printf("inserting map node\n");
+
   if(find_node(pointer)){
     return 0; //we already had the allocation in our allocation information
   }
-  
-  map_node_t * curr = alloc_info;
-  if(curr != NULL){
-    while(curr->next != NULL){
-      curr = curr->next;
-    }
-  }
-  
-  map_node_t * newnode = malloc(sizeof(map_node_t));
-  //assigning
-  curr->next = newnode;
+  map_node_t * newnode = (map_node_t *)malloc(sizeof(map_node_t));
 
   newnode->allocated_pointer = pointer;
   //what is a molule, line, call site, or program counter
   //the following lines are most definately wrong
   newnode->call_site = module;
   newnode->program_counter = line;
+
+  map_node_t * curr = alloc_info;
+
+  printf("List head %p\n", alloc_info);
+
+  int i = 0;
+
+  if(curr != NULL){
+    while(curr->next != NULL){
+      curr = curr->next;
+      i++;
+    }
+  }else{
+    curr = newnode;
+    alloc_info = curr; //why do I need this line???
+    printf("curr %p  == list %p\n", curr, alloc_info);
+    //printf("  0x%x allocated by %s::%s\n", (uint)alloc_info->allocated_pointer, alloc_info->call_site, alloc_info->program_counter);
+    printf("  0x%x allocated by %s::%s\n", (uint)curr->allocated_pointer, curr->call_site, curr->program_counter);
+    return 1;
+  }
+  
+  
+  //assigning
+  curr->next = newnode;
+  printf("  0x%x allocated by %s::%s\n", (uint)newnode->allocated_pointer, newnode->call_site, newnode->program_counter);
+
+
   return 1;
 }
 
@@ -88,6 +110,8 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  
 int map_remove(uintptr_t pointer) {
   
+  printf("removinging map node\n");
+
   map_node_t* curr = alloc_info;
   if(curr != NULL){
     while(curr->next != NULL){
@@ -119,6 +143,9 @@ int map_remove(uintptr_t pointer) {
 int map_count() {
   map_node_t * temp = alloc_info;
   int count = 0;
+  if(temp == NULL){
+    return 0;
+  }
   while(temp->next != NULL){
     temp = temp->next;
     count++;
@@ -134,8 +161,12 @@ void map_dump() {
   map_node_t* temp = alloc_info;
   printf("Map dump %p\n", temp);
   int i = 0;
+  if(temp == NULL){
+    printf("No allocations remain\n");
+    return;
+  }
   while (temp->next != NULL) {
     temp = temp->next;
-    printf("  0x%x allocated by %s::%s", (uint)temp->allocated_pointer, temp->call_site, temp->program_counter);
+    printf("  0x%x allocated by %s::%s\n", (uint)temp->allocated_pointer, temp->call_site, temp->program_counter);
   }
 }

@@ -71,9 +71,9 @@ void list_task(void) {
       struct listNode * curNode  = head.next;
       struct listNode * nextNode;
       while(curNode != NULL){
-	nextNode = curNode->next;
-	free(curNode);
-	curNode = nextNode;
+	      nextNode = curNode->next;
+	      free(curNode); //edit to create bad code
+	      curNode = nextNode;
       }
       //exit program
       return;

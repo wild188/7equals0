@@ -1,11 +1,8 @@
-//Balls
-
-
-
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <dlfcn.h>
+//#include "list.c"
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -24,22 +21,30 @@ void map_dump();
 
 /* TODO: Your code goes here */
 
-int unfreeBlocks; //To count allocations and frees
+//int unfreeBlocks; //To count allocations and frees
+
+//to ingnore backtrace on child processes that might use malloc
+static int childprocess;
 
 //Declaring and mapping constructor and deconstructor functions
 void OpenMemoryManagement()__attribute__((constructor)); 
 void CloseMemoryManagement()__attribute__((destructor));
 
 void OpenMemoryManagement() { // This is the constructor
-    //printf("created memory management lib\n");
-    unfreeBlocks = 0;
+    childprocess = 1;
+    printf("created memory management lib\n");
+    //unfreeBlocks = 0;
+    childprocess = 0;
 }
 
 void CloseMemoryManagement(){ // This is the deconstructor
-    printf("%i unfreed blocks of memory.\n", unfreeBlocks);
-    if(unfreeBlocks != 0){
+    childprocess = 1;
+    int remainingBlocks = map_count();
+    printf("%i unfreed blocks of memory.\n", remainingBlocks); //unfreeBlocks);
+    if(1 || remainingBlocks != 0){
         map_dump();
     }
+    childprocess = 0;
 }
 
 //a wrapper function for the real malloc
@@ -57,16 +62,24 @@ static void ogFree(void * space){
 
 //should intercept calls to malloc
 void * malloc(size_t size){
-    unfreeBlocks++;
     void * pointer = ogMalloc(size);
     //need to get module and line pointers
-    map_insert((uintptr_t)pointer, NULL, NULL);
+    if(!childprocess){
+        childprocess = 1;
+        //unfreeBlocks++; //not sure where this line should be
+        map_insert((uintptr_t)pointer, NULL, NULL);
+        childprocess = 0;
+    }
     return pointer;
 }
 
 //should intercept calls to free
 void free(void * space){
-    unfreeBlocks--;
-    map_remove((uintptr_t)space);
+    if(!childprocess){
+        childprocess = 1;
+        //unfreeBlocks--;
+        map_remove((uintptr_t)space);
+        childprocess = 0;
+    }
     return ogFree(space);
 }
