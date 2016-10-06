@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <dlfcn.h>
 //#include "list.c"
+#include <execinfo.h>
+#include <string.h>
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -66,8 +68,20 @@ void * malloc(size_t size){
     //need to get module and line pointers
     if(!childprocess){
         childprocess = 1;
-        //unfreeBlocks++; //not sure where this line should be
-        map_insert((uintptr_t)pointer, NULL, NULL);
+        //Getting backtrace information
+
+        void * buffer[1024];
+        int backtraceSize = backtrace(buffer, 1024);
+        char ** backtraceSymbols = backtrace_symbols(buffer, backtraceSize);
+
+        char * caller;
+        char * instructionPointer;
+        if(backtraceSize > 2){
+            caller = strtok(backtraceSymbols[1], " ");
+            instructionPointer = strtok(NULL, " ");
+        }
+
+        map_insert((uintptr_t)pointer, caller, instructionPointer);
         childprocess = 0;
     }
     return pointer;
