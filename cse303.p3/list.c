@@ -71,8 +71,6 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
 
   map_node_t * curr = alloc_info;
 
-  printf("List head %p\n", alloc_info);
-
   int i = 0;
 
   if(curr != NULL){
@@ -83,9 +81,9 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
   }else{
     curr = newnode;
     alloc_info = curr; //why do I need this line???
-    printf("curr %p  == list %p\n", curr, alloc_info);
+    //printf("newNode %p  == list %p\n", newNode, alloc_info);
     //printf("  0x%x allocated by %s::%s\n", (uint)alloc_info->allocated_pointer, alloc_info->call_site, alloc_info->program_counter);
-    printf("  0x%x allocated by %s::%s\n", (uint)curr->allocated_pointer, curr->call_site, curr->program_counter);
+    //printf("  0x%x allocated by %s::%s\n", (uint)newNode->allocated_pointer, curr->call_site, curr->program_counter);
     return 1;
   }
   
@@ -114,6 +112,10 @@ int map_remove(uintptr_t pointer) {
 
   map_node_t* curr = alloc_info;
   if(curr != NULL){
+    if(curr->allocated_pointer == pointer){
+      alloc_info = curr->next;
+      return 1;
+    }
     while(curr->next != NULL){
       if(curr->next->allocated_pointer == pointer){
         map_node_t * target = curr->next;
