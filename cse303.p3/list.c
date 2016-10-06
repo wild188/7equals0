@@ -20,8 +20,8 @@
  */
 typedef struct map_node
 {
-  uintptr_t allocated_pointer;
   char      *call_site;
+  uintptr_t allocated_pointer;
   char      *program_counter;
   struct map_node * next;
 } map_node_t;
@@ -123,8 +123,6 @@ int map_remove(uintptr_t pointer) {
     if(curr->allocated_pointer == pointer){
       alloc_info = curr->next;
       free(curr);
-      printf("first ret");
-      map_dump();
       return 1;
     }
     while(curr->next != NULL){
@@ -132,15 +130,11 @@ int map_remove(uintptr_t pointer) {
         map_node_t * target = curr->next;
         curr->next = curr->next->next;
         free(target);
-        printf("second ret");
-        map_dump();
         return 1;
       }
       curr = curr->next;
     }
   }
-  printf("third ret");
-  map_dump();
   return 0;
 /*
   map_node_t * space = find_node(pointer);

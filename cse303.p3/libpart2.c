@@ -93,10 +93,8 @@ void free(void * space){
     if(!childprocess){
         childprocess = 1;
         //unfreeBlocks--;
-        if(map_remove((uintptr_t)space) == 1){
-            ogFree(space);
-            childprocess = 0;
-            return;
+        if(map_remove((uintptr_t)space) == 0){
+            printf("bad error map_remove returned 0");
         }
         childprocess = 0;
     }
