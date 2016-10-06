@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 //#include "libpart2.c"
 
@@ -19,8 +20,8 @@
  */
 typedef struct map_node
 {
-  uintptr_t allocated_pointer;
   char      *call_site;
+  uintptr_t allocated_pointer;
   char      *program_counter;
   struct map_node * next;
 } map_node_t;
@@ -59,15 +60,20 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
   printf("inserting map node\n");
 
   if(find_node(pointer)){
+    printf("returned 0");
     return 0; //we already had the allocation in our allocation information
   }
   map_node_t * newnode = (map_node_t *)malloc(sizeof(map_node_t));
 
   newnode->allocated_pointer = pointer;
-  //what is a molule, line, call site, or program counter
-  //the following lines are most definately wrong
-  newnode->call_site = module;
-  newnode->program_counter = line;
+  char modCpy[100];
+  char lineCpy[100];
+  //the malloced newnode now gets the values of module and line copied into call_site and program_counter
+  strcpy(modCpy, module);
+  strcpy(lineCpy, line);
+
+  newnode->call_site = modCpy;
+  newnode->program_counter = lineCpy;
 
   map_node_t * curr = alloc_info;
 
@@ -106,6 +112,8 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  *            map (which would suggest a double-free).
  */
  
+void map_dump();
+
 int map_remove(uintptr_t pointer) {
   
   printf("removinging map node\n");
@@ -114,6 +122,7 @@ int map_remove(uintptr_t pointer) {
   if(curr != NULL){
     if(curr->allocated_pointer == pointer){
       alloc_info = curr->next;
+      free(curr);
       return 1;
     }
     while(curr->next != NULL){
@@ -123,9 +132,9 @@ int map_remove(uintptr_t pointer) {
         free(target);
         return 1;
       }
+      curr = curr->next;
     }
   }
-
   return 0;
 /*
   map_node_t * space = find_node(pointer);

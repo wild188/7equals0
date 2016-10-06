@@ -5,6 +5,7 @@
 //#include "list.c"
 #include <execinfo.h>
 #include <string.h>
+#include <stdlib.h>
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -92,7 +93,9 @@ void free(void * space){
     if(!childprocess){
         childprocess = 1;
         //unfreeBlocks--;
-        map_remove((uintptr_t)space);
+        if(map_remove((uintptr_t)space) == 0){
+            printf("bad error map_remove returned 0");
+        }
         childprocess = 0;
     }
     return ogFree(space);
