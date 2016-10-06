@@ -1,0 +1,96 @@
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "support.h"
+
+/*
+ * tail_file() - display the last numlines lines of a file or stdin
+ */
+void tail_file(char *filename, int numlines) {
+  FILE *in = fopen(filename, "r");
+  char array[numlines][1024];
+  int x = 0;
+  char ch;
+  int chNum = 0;
+  if(!in){
+    in = stdin;
+  }
+  while((ch = fgetc(in)) != EOF){
+      array[x][chNum] = ch;
+      chNum++;
+      if(ch == '\n'){
+	x++;
+	chNum = 0;
+      }
+      if(x == numlines){
+	x = 0;
+      }
+  }
+    int holder = --x;
+    int count;
+    x++;
+
+    for(; x < numlines; x++){
+      count = 0;
+      while(array[x][count] != '\n' && array[x][count] != EOF){
+	putchar(array[x][count]);
+	count++;
+      }
+      putchar('\n');
+    }
+
+    int y;
+    for(y = 0; y <= holder; y++){
+      count = 0;
+      while(array[y][count] != '\n'){
+        putchar(array[y][count]);
+        count++;
+      }
+      putchar('\n');
+    }
+    if(in == stdin){
+      return;
+    }
+    fclose(in);
+}
+
+/*
+ * help() - Print a help message.
+ */
+void help(char *progname) {
+    printf("Usage: %s [FILE]\n", progname);
+    printf("Print the last 10 lines  of FILE to STDOUT\n");
+    printf("With no FILE, read from STDIN\n");
+    printf("  -nK    print the last K lines instead of the last 10\n");
+}
+
+/*
+ * main() - The main routine parses arguments and dispatches to the
+ *          task-specific code.
+ */
+int main(int argc, char **argv) {
+    /* for getopt */
+    long opt;
+    int numlines = 10;
+
+    /* run a student name check */
+    check_student(argv[0]);
+
+    /* parse the command-line options.  For this program, we only support  */
+    /* the parameterless 'h' option, for getting help on program usage, */
+    /* and the parametered 'n' option, for getting the number of lines. */
+    /* TODO: parse the arguments correctly */
+    while ((opt = getopt(argc, argv, "hn:")) != -1) {
+        switch(opt) {
+	case 'h': help(argv[0]); break;
+	case 'n': numlines = atoi(optarg); break; 
+        }
+    }
+
+    /* TODO: fix this invocation */
+    if(argc == 1){
+      tail_file(NULL, numlines);
+      return 1;
+    }
+    tail_file(argv[argc - 1], numlines);
+}

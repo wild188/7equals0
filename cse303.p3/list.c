@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 //#include "libpart2.c"
 
@@ -64,10 +65,14 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
   map_node_t * newnode = (map_node_t *)malloc(sizeof(map_node_t));
 
   newnode->allocated_pointer = pointer;
-  //what is a molule, line, call site, or program counter
-  //the following lines are most definately wrong
-  newnode->call_site = module;
-  newnode->program_counter = line;
+  char modCpy[100];
+  char lineCpy[100];
+  //the malloced newnode now gets the values of module and line copied into call_site and program_counter
+  strcpy(modCpy, module);
+  strcpy(lineCpy, line);
+
+  newnode->call_site = modCpy;
+  newnode->program_counter = lineCpy;
 
   map_node_t * curr = alloc_info;
 
