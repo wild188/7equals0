@@ -23,7 +23,7 @@ DEPS      = $(patsubst %, $(ODIR)/%.d,  $(CFILES) $(CSOFILES) $(TARGETS))
 
 CC = gcc
 CFLAGS = -MMD -O2 -m$(BITS) -ggdb -g -D_GNU_SOURCE -std=gnu11 -fPIC -ldl
-SOFLAGS = -fPIC -shared -ldl
+SOFLAGS = -fPIC -shared
 LDFLAGS = -m$(BITS) -ldl
 
 # Best to be safe...
@@ -57,6 +57,9 @@ $(ODIR)/%.so: %.c
 $(ODIR)/libpart2.so: libpart2.c $(ODIR)/list.o
 	@echo "[CC] $^ --> $@"
 	@$(CC) $^ -o $@ $(CFLAGS) $(SOFLAGS)
+
+#billy going cray
+
 
 # clean by clobbering the build folder
 clean:

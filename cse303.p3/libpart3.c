@@ -6,7 +6,9 @@
 #include <unistd.h>
 #include <stdarg.h> //... wizardry
 #include <dlfcn.h>
-#include <stdio.h>
+
+#include <sys/cdefs.h>
+//#include <stdio.h>
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -16,8 +18,8 @@
 
 /* TODO: Your code goes here */
 
-int theFinalCountDown;
-int childprocess;
+static int theFinalCountDown;
+static int childprocess;
 
 //Declaring and mapping constructor and deconstructor functions
 void StartCountDown()__attribute__((constructor)); 
@@ -34,7 +36,7 @@ void StartCountDown(){
 }
 
 void Terminator(){
-    ogPrintf("Turn down for what");
+    ogPrintf("Turn down for what\n");
 }
 
 //printf wrapper function
@@ -48,7 +50,7 @@ void ogPrintf(const char * formatString, ...){
 }
 
 char * ogScanf(){
-
+    
 }
 
 void evilPrintf(const char * formatString){
@@ -56,15 +58,21 @@ void evilPrintf(const char * formatString){
     ogPrintf("Evil shit\n");
 }
 
-int printf(const char * formatString, ...){ //what the fuck are we going to do with teh ...???
-    
+//what the fuck are we going to do with teh ...???
 
+//int printf(__const char * __restrice __format, ...)
+
+//int printf(__const char * format, ...){ 
+//__fortify_function int printf (const char *__restrict __fmt, ...){
+
+int printf(__const char * __restrict __fmt, ...){
+    const char * formatString = __fmt; //useless
     
-    theFinalCountDown --;
-    ogPrintf("Counting down:\n");
+    theFinalCountDown--;
+    ogPrintf("Counting down: %i\n", theFinalCountDown);
     //dealing with teh ...s
     va_list args;
-    va_start(args, formatString);
+    va_start(args, __fmt);
 
     if(theFinalCountDown < 0){
         //evil shit
@@ -90,3 +98,7 @@ int printf(const char * formatString, ...){ //what the fuck are we going to do w
     return 0; //Dont know what shoule be returned
 }
 
+int scanf(const char * fmt, ...){
+    ogPrintf("Bullshit \n"); //lack of proccessing creates infinite loop
+    return 0;
+}
