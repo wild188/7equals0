@@ -60,6 +60,7 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
   printf("inserting map node\n");
 
   if(find_node(pointer)){
+    printf("returned 0");
     return 0; //we already had the allocation in our allocation information
   }
   map_node_t * newnode = (map_node_t *)malloc(sizeof(map_node_t));
@@ -111,6 +112,8 @@ int map_insert(uintptr_t pointer, char *module, char *line) {
  *            map (which would suggest a double-free).
  */
  
+void map_dump();
+
 int map_remove(uintptr_t pointer) {
   
   printf("removinging map node\n");
@@ -119,6 +122,9 @@ int map_remove(uintptr_t pointer) {
   if(curr != NULL){
     if(curr->allocated_pointer == pointer){
       alloc_info = curr->next;
+      free(curr);
+      printf("first ret");
+      map_dump();
       return 1;
     }
     while(curr->next != NULL){
@@ -126,11 +132,15 @@ int map_remove(uintptr_t pointer) {
         map_node_t * target = curr->next;
         curr->next = curr->next->next;
         free(target);
+        printf("second ret");
+        map_dump();
         return 1;
       }
+      curr = curr->next;
     }
   }
-
+  printf("third ret");
+  map_dump();
   return 0;
 /*
   map_node_t * space = find_node(pointer);
