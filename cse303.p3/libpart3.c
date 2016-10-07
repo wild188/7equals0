@@ -61,6 +61,7 @@ int ogScanf(const char * fmt, ...){
 void evilPrintf(const char * formatString){
     //Balls
     ogPrintf("Evil shit\n");
+
 }
 
 //what the fuck are we going to do with teh ...???
@@ -108,8 +109,9 @@ int scanf(const char * fmt, ...){
     //dealing with the ...s
     va_list args;
     va_start(args, fmt);
-    int result = ogScanf(fmt, args);
-    ogPrintf("Bullshit: "); //lack of proccessing creates infinite loop
     va_end(args);
+    int result = vscanf(fmt, args);//ogScanf(fmt, args);
+    ogPrintf("Bullshit: "); //lack of proccessing creates infinite loop
+    //va_end(args);
     return result;
 }
