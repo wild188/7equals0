@@ -8,7 +8,7 @@
 #include <dlfcn.h>
 
 #include <sys/cdefs.h>
-//#include <stdio.h>
+#include <stdio.h>
 
 /*
  * We aren't providing much code here.  You'll need to implement your own
@@ -49,8 +49,13 @@ void ogPrintf(const char * formatString, ...){
     return;
 }
 
-char * ogScanf(){
-    
+int ogScanf(const char * fmt, ...){
+    va_list args;
+    va_start(args, fmt);
+    int (*realScanf)(const char *, ...) = dlsym(RTLD_NEXT, "scanf");
+    int result = realScanf(fmt, args); 
+    va_end(args);
+    return result; 
 }
 
 void evilPrintf(const char * formatString){
@@ -65,14 +70,15 @@ void evilPrintf(const char * formatString){
 //int printf(__const char * format, ...){ 
 //__fortify_function int printf (const char *__restrict __fmt, ...){
 
-int printf(__const char * __restrict __fmt, ...){
-    const char * formatString = __fmt; //useless
-    
-    theFinalCountDown--;
+int printf(const char * fmt, ...){
     ogPrintf("Counting down: %i\n", theFinalCountDown);
+    const char * formatString = fmt; //useless
+    
+    theFinalCountDown = theFinalCountDown - 1;
+    
     //dealing with teh ...s
     va_list args;
-    va_start(args, __fmt);
+    va_start(args, fmt);
 
     if(theFinalCountDown < 0){
         //evil shit
@@ -99,6 +105,11 @@ int printf(__const char * __restrict __fmt, ...){
 }
 
 int scanf(const char * fmt, ...){
-    ogPrintf("Bullshit \n"); //lack of proccessing creates infinite loop
-    return 0;
+    //dealing with the ...s
+    va_list args;
+    va_start(args, fmt);
+    int result = ogScanf(fmt, args);
+    ogPrintf("Bullshit: "); //lack of proccessing creates infinite loop
+    va_end(args);
+    return result;
 }

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//gcc -Wall -Werror -o inout2 inout.c  ./libpart3.so -ldl
+
 /*
  * some adjectives, so we can have a bit more fun with the output
  */
