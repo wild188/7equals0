@@ -91,12 +91,29 @@ void engageDrEvil(){
                 //dup2(STDIN, EVILFILENAME);
             }else{
                 char * filename = "evil.txt";
-                int out = open(filename, O_RDWR);
+                int out = open(filename, O_RDWR|O_CREAT, 0666);
                 dup2(0, out);
+
+                ogPrintf("Created file\n");
+
+            }   
+
+            int status;
+
+            while(waitpid(normalLib, &status, WNOHANG | WUNTRACED)){
+                if(WIFEXITED(status)){
+                    //load exploit librarr
+                    ogPrintf("Our parent has died and now we are an orphan!\n");
+                    exit(0);
+                }else{
+                    continue;
+                }
             }
-            
         }else{
             //we are the parent
+
+            ogPrintf("We are the parent\n");
+
             int a[] = {0, mypid};
             pipe(a);
         }
