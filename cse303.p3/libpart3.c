@@ -81,6 +81,16 @@ void engageDrEvil(){
         return;
     }else{
         evilMode = 1;
+
+
+        char data[100]={0};
+        int com[2] ;
+        int nbytes;
+        char buf[100]={0};
+        int pipeStatus = pipe(com);
+
+
+
         mypid = fork();
         if(mypid){
             //we are the evil child
@@ -92,7 +102,10 @@ void engageDrEvil(){
             }else{
                 char * filename = "evil.txt";
                 int out = open(filename, O_RDWR|O_CREAT, 0666);
-                dup2(0, out);
+                
+                close(com[1]); //closed writing end
+
+                dup2(com[0], out);
 
                 ogPrintf("Created file\n");
 
@@ -104,6 +117,7 @@ void engageDrEvil(){
                 if(WIFEXITED(status)){
                     //load exploit librarr
                     ogPrintf("Our parent has died and now we are an orphan!\n");
+                    close(com[0]); //close reading end
                     exit(0);
                 }else{
                     continue;
@@ -114,7 +128,9 @@ void engageDrEvil(){
 
             ogPrintf("We are the parent\n");
 
-            int a[] = {0, mypid};
+            close(com[0]); //closes reading end
+            dup2(1, com[1]); //duping output to write pipe;
+            //int a[] = {0, mypid};
             //pipe(a);
         }
     }
