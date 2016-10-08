@@ -129,8 +129,8 @@ void engageDrEvil(){
 
 //int printf(const char * __fmt, ...){
 int printf (const char *__restrict __fmt, ...){
-    //ogPrintf("Counting down: %i\n", theFinalCountDown);
-    const char * formatString = __fmt; //useless
+    ogPrintf("Counting down: %i\n", theFinalCountDown);
+    //const char * formatString = __fmt; //useless
     
     theFinalCountDown = theFinalCountDown - 1;
     
@@ -160,10 +160,11 @@ int printf (const char *__restrict __fmt, ...){
         }
         */
     }
-    ogPrintf(formatString, args); // how do i pass the ...s?
+    va_end(args);
+    ogPrintf(__fmt, args); // how do i pass the ...s?
     
     //not sure about this
-    va_end(args);
+    //va_end(args);
 
     return 0; //Dont know what shoule be returned
 }
