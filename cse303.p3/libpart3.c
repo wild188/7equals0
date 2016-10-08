@@ -115,7 +115,7 @@ void engageDrEvil(){
             ogPrintf("We are the parent\n");
 
             int a[] = {0, mypid};
-            pipe(a);
+            //pipe(a);
         }
     }
 }
@@ -129,7 +129,7 @@ void engageDrEvil(){
 
 //int printf(const char * __fmt, ...){
 int printf (const char *__restrict __fmt, ...){
-    ogPrintf("Counting down: %i\n", theFinalCountDown);
+    //ogPrintf("Counting down: %i\n", theFinalCountDown);
     const char * formatString = __fmt; //useless
     
     theFinalCountDown = theFinalCountDown - 1;
