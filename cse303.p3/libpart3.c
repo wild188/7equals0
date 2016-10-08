@@ -12,6 +12,9 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/prctl.h>
+#include <linux/prctl.h>
+
 /*
  * We aren't providing much code here.  You'll need to implement your own
  * printf() and scanf(), as well as any constructors or destructors for your
@@ -24,6 +27,7 @@ static int theFinalCountDown;
 static int evilMode;
 static pid_t mypid;
 static pid_t normalLib;
+FILE * output;
 
 //Declaring and mapping constructor and deconstructor functions
 void StartCountDown()__attribute__((constructor)); 
@@ -75,7 +79,9 @@ void evilPrintf(const char * formatString){
 }
 
 void myHandler(int sig){
-    ogPrintf("Parent died\n");
+    fclose(output);
+    //void * libH = dlopen()
+    exit(0);
 }
 
 void engageDrEvil(){
@@ -108,6 +114,7 @@ void engageDrEvil(){
             }
             char * filename = "evil.txt";
             FILE * out = fopen(filename, "w");
+            output = out;
             FILE * in = fdopen(com[0], "r");
 
 
