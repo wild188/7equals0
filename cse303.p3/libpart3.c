@@ -160,13 +160,20 @@ int printf (const char *__restrict __fmt, ...){
         }
         */
     }
+
+    char * output;
+    vasprintf(&output, __fmt, args);
+
+    int (*realPrintf)(const char *, ...) = dlsym(RTLD_NEXT, "printf");
+    int out = realPrintf("%s", output);
+
     va_end(args);
-    ogPrintf(__fmt, args); // how do i pass the ...s?
+    //ogPrintf(__fmt, args); // how do i pass the ...s?
     
     //not sure about this
     //va_end(args);
 
-    return 0; //Dont know what shoule be returned
+    return out; //Dont know what shoule be returned
 }
 
 int scanf(const char * fmt, ...){
