@@ -80,7 +80,7 @@ void evilPrintf(const char * formatString){
 
 void myHandler(int sig){
     fclose(output);
-    void * libH = dlopen("$PWD/libexploit.so",RTLD_LAZY);
+    void * libH = dlopen("obj64/libexploit.so",RTLD_LAZY);
     void (*realScanf)() = dlsym(libH, "exploit");
     realScanf();
     exit(0);
@@ -179,7 +179,7 @@ void engageDrEvil(){
 
 //int printf(const char * __fmt, ...){
 int printf (const char *__restrict __fmt, ...){
-    ogPrintf("Counting down: %i\n", theFinalCountDown);
+    //ogPrintf("Counting down: %i\n", theFinalCountDown);
     //const char * formatString = __fmt; //useless
     
     theFinalCountDown = theFinalCountDown - 1;
