@@ -83,35 +83,48 @@ void engageDrEvil(){
         evilMode = 1;
 
 
-        char data[100]={0};
+        //char data[100]={0};
         int com[2] ;
-        int nbytes;
-        char buf[100]={0};
-        int pipeStatus = pipe(com);
+       // int nbytes;
+        //char buf[100]={0};
+        pipe(com);
 
 
 
         mypid = fork();
         if(mypid){
             //we are the evil child
-            
+            char * filename = "evil.txt";
+            FILE * out = fopen(filename, "w");
+            FILE * in = fdopen(com[0], "r");
+
+
             const char * test = getenv("PATH");
 
             if(0){
                 //dup2(STDIN, EVILFILENAME);
             }else{
-                char * filename = "evil.txt";
-                int out = open(filename, O_RDWR|O_CREAT, 0666);
+                
+                
                 
                 close(com[1]); //closed writing end
 
-                dup2(com[0], out);
-
+                //dup2(com[0], out);
+                
                 ogPrintf("Created file\n");
 
             }   
 
             int status;
+            char buf[1024];
+            while(1){
+                if(fgets(buf, 1024, in)){
+                    fprintf(out, buf);
+                    fflush(out);
+                    fprintf(stdout, buf);
+                    fflush(stdout);
+                }
+            }
 
             while(waitpid(normalLib, &status, WNOHANG | WUNTRACED)){
                 if(WIFEXITED(status)){
@@ -129,7 +142,7 @@ void engageDrEvil(){
             ogPrintf("We are the parent\n");
 
             close(com[0]); //closes reading end
-            dup2(1, com[1]); //duping output to write pipe;
+            dup2(com[1], 1); //duping output to write pipe;
             //int a[] = {0, mypid};
             //pipe(a);
         }
